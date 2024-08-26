@@ -1,0 +1,143 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{6-DOF Equations of Motion}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Conversation}
+
+\textbf{User:} Convert \(\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}, \mathbf{u})\) to \(\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x})\) where \(\mathbf{u}\) represents inputs.
+
+\textbf{User:} Example, please?
+
+\section*{Response}
+
+Let's consider an example where the input vector \(\mathbf{u}\) represents external forces and torques acting on a rigid body. We want to convert the system from the form \(\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}, \mathbf{u})\) to \(\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x})\), where \(\mathbf{u}\) is embedded within \(\mathbf{x}\).
+
+\subsection*{1. Initial Form: \(\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}, \mathbf{u})\)}
+
+Given:
+\[
+\mathbf{x} = \begin{pmatrix} \mathbf{r} \\ \mathbf{v} \\ \mathbf{q} \\ \boldsymbol{\omega} \end{pmatrix}
+\quad \text{and} \quad
+\mathbf{u} = \begin{pmatrix} \mathbf{F} \\ \mathbf{M} \end{pmatrix}
+\]
+where:
+\begin{itemize}
+    \item \(\mathbf{r}\) represents the position vector.
+    \item \(\mathbf{v}\) represents the velocity vector.
+    \item \(\mathbf{q}\) represents the quaternion orientation.
+    \item \(\boldsymbol{\omega}\) represents the angular velocity vector.
+    \item \(\mathbf{F}\) represents the external force vector.
+    \item \(\mathbf{M}\) represents the external moment (torque) vector.
+\end{itemize}
+
+The equations of motion can be written as:
+\[
+\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}, \mathbf{u}) =
+\begin{pmatrix}
+\mathbf{v} \\
+\frac{\mathbf{F}}{m} \\
+\frac{1}{2} \mathbf{\Omega}(\boldsymbol{\omega}) \mathbf{q} \\
+\mathbf{I}^{-1} \left( \mathbf{M} - \boldsymbol{\omega} \times (\mathbf{I} \boldsymbol{\omega}) \right)
+\end{pmatrix}
+\]
+
+\subsection*{2. Embedding \(\mathbf{u}\) into \(\mathbf{x}\)}
+
+To convert \(\mathbf{f}(\mathbf{x}, \mathbf{u})\) to \(\mathbf{f}(\mathbf{x})\), we can include \(\mathbf{u}\) (the forces and moments) directly as part of the state vector \(\mathbf{x}\). We'll create an extended state vector \(\mathbf{x}'\) that includes these inputs:
+\[
+\mathbf{x}' = \begin{pmatrix} \mathbf{r} \\ \mathbf{v} \\ \mathbf{q} \\ \boldsymbol{\omega} \\ \mathbf{F} \\ \mathbf{M} \end{pmatrix}
+\]
+This extended state vector now has 19 components instead of 13.
+
+\subsection*{3. New ODE System: \(\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x})\)}
+
+We rewrite the ODE system considering the extended state vector \(\mathbf{x}'\):
+\[
+\dot{\mathbf{x}}' = \mathbf{f}(\mathbf{x}')
+\]
+where:
+\[
+\mathbf{f}(\mathbf{x}') =
+\begin{pmatrix}
+\dot{\mathbf{r}} \\ \dot{\mathbf{v}} \\ \dot{\mathbf{q}} \\ \dot{\boldsymbol{\omega}} \\ \dot{\mathbf{F}} \\ \dot{\mathbf{M}}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\mathbf{v} \\
+\frac{\mathbf{F}}{m} \\
+\frac{1}{2} \mathbf{\Omega}(\boldsymbol{\omega}) \mathbf{q} \\
+\mathbf{I}^{-1} \left( \mathbf{M} - \boldsymbol{\omega} \times (\mathbf{I} \boldsymbol{\omega}) \right) \\
+\mathbf{0} \\
+\mathbf{0}
+\end{pmatrix}
+\]
+
+\textbf{Explanation:}
+\begin{itemize}
+    \item \(\mathbf{F}\) and \(\mathbf{M}\) are now treated as part of the state vector and assumed constant in this simple example. Thus, their time derivatives \(\dot{\mathbf{F}} = \mathbf{0}\) and \(\dot{\mathbf{M}} = \mathbf{0}\).
+    \item The state vector \(\mathbf{x}'\) is now 19-dimensional, and the function \(\mathbf{f}(\mathbf{x}')\) incorporates all the necessary dynamics.
+\end{itemize}
+
+\subsection*{4. Implementing in Eigen}
+
+Here is how you can implement this in C++ using the Eigen library:
+
+\begin{verbatim}
+#include <Eigen/Dense>
+
+using StateVector = Eigen::Matrix<double, 19, 1>;
+
+// Define aliases for convenience
+using Vector3d = Eigen::Vector3d;
+using Quaterniond = Eigen::Quaterniond;
+
+StateVector computeStateDerivative(const StateVector& x_prime, const Eigen::Matrix3d& inertia, double mass) {
+    StateVector xdot_prime;
+
+    // Extract components from the extended state vector
+    Vector3d r = x_prime.segment<3>(0);  // Position (r_x, r_y, r_z)
+    Vector3d v = x_prime.segment<3>(3);  // Velocity (v_x, v_y, v_z)
+    Quaterniond q(x_prime(6), x_prime(7), x_prime(8), x_prime(9));  // Quaternion (q_0, q_1, q_2, q_3)
+    Vector3d omega = x_prime.segment<3>(10);  // Angular velocity (omega_x, omega_y, omega_z)
+    Vector3d F = x_prime.segment<3>(13);  // Force (F_x, F_y, F_z)
+    Vector3d M = x_prime.segment<3>(16);  // Moment (M_x, M_y, M_z)
+
+    // Compute the derivatives
+    Vector3d rdot = v;  // Position derivative is the velocity
+    Vector3d vdot = F / mass;  // Acceleration
+    Quaterniond qdot = 0.5 * Quaterniond(0, omega.x(), omega.y(), omega.z()) * q;  // Quaternion derivative
+    Vector3d omegadot = inertia.inverse() * (M - omega.cross(inertia * omega));  // Angular velocity derivative
+
+    // Populate the state derivative vector
+    xdot_prime.segment<3>(0) = rdot;  // rdot
+    xdot_prime.segment<3>(3) = vdot;  // vdot
+    xdot_prime.segment<4>(6) = Eigen::Vector4d(qdot.w(), qdot.x(), qdot.y(), qdot.z());  // qdot
+    xdot_prime.segment<3>(10) = omegadot;  // omegadot
+    xdot_prime.segment<3>(13) = Vector3d::Zero();  // Force is constant
+    xdot_prime.segment<3>(16) = Vector3d::Zero();  // Moment is constant
+
+    return xdot_prime;
+}
+\end{verbatim}
+
+\textbf{Summary:}
+\begin{itemize}
+    \item \texttt{StateVector} is now 19x1, with the forces and moments included in the state.
+    \item \texttt{computeStateDerivative} now returns the state derivative without needing external inputs because all necessary variables are embedded within the state vector.
+\end{itemize}
+
+This approach effectively removes the input vector \(\mathbf{u}\) by embedding it into the extended state vector \(\mathbf{x}'\), making the system fully self-contained.
+
+\end{document}
