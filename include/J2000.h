@@ -1,19 +1,22 @@
 /*
  * ----------------------------------------------------------------------------
- * Project:     [6DoF]
+ * Project:     [EBEK]
  * File:        [J2000.h]
  * Author:      Onur Tuncer, PhD
  * Email:       tuncero@itu.edu.tr
  * Institution: Istanbul Technical University
+ *              Faculty of Aeronautics and Astronuatics
+ * 
+ * Date:        2024
  *
  * Description:
- * [Brief description of the file's purpose and functionality]
+ * [Routines to aid with calculations with J2000 epoch]
  *
  * License:
- * [Specify the license under which this code is distributed, if applicable]
+ * [See License.txt in the top level directory for licence and copyright information]
  *
  * ----------------------------------------------------------------------------
- * /
+ */
 
 #ifndef J2000_H
 #define J2000_H
@@ -23,6 +26,9 @@
 #include <ctime>
 
 // Julian Date for J2000 epoch
+// The J2000. 0 epoch is precisely Julian date 2451545.0 TT (Terrestrial Time), or January 1, 2000, noon TT. 
+// This is equivalent to January 1, 2000, 11:59:27.816 TAI or January 1, 2000, 11:58:55.816 UTC.
+
 constexpr double J2000_JULIAN_DATE = 2451545.0;
 
 // Function to calculate Julian Date from a given date

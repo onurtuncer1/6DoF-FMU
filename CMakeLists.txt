@@ -1,13 +1,57 @@
-cmake_minimum_required(VERSION 3.15)
+# /* ----------------------------------------------------------------------------*
+#   Copyright 2024 
+#
+#   
+#   Contact tuncero@itu.edu.tr
+# -------------------------------------------------------------------------------*/
+
+cmake_minimum_required(VERSION 3.20)
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" projectVersion)
 project(fmu4cpp-template VERSION ${projectVersion})
 
 option(FMU4CPP_BUILD_TESTS "Build tests" OFF)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(modelIdentifier identity)
+list(APPEND FMU_TARGETS 3DoFFixedMass)
+
+# ---------------------------------------Looking for git and updating submodules-------------------
+find_package(Git QUIET)
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+
+# Git version
+execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+                WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                OUTPUT_VARIABLE PACKAGE_GIT_VERSION
+                ERROR_QUIET
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+# Update submodules as needed
+    if(GIT_SUBMODULE)
+        message(STATUS "Submodule update")
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(WARNING "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+        endif()
+    endif()
+endif()
+
+#-----------------------------------------------------------------------------------------------------
+
+# ***** Build libode library *****************************************************
+
+file(GLOB libode_SRC  "vendor/libode/src/*.cc")
+
+add_library(libode STATIC ${libode_SRC})
+
+set_target_properties(libode PROPERTIES     CXX_STANDARD 17
+                                            CXX_STANDARD_REQUIRED ON
+                                            CXX_EXTENSIONS OFF)
+target_include_directories(libode PUBLIC "vendor/libode/src")
+# ********************************************************************************
 
 if (MSVC)
     # link statically against the the Visual C runtime

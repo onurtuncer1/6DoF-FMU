@@ -1,16 +1,20 @@
 /*
  * ----------------------------------------------------------------------------
- * Project:    [Project Name]
- * File:       [Filename.cpp]
- * Author:     Onur Tuncer, PhD
- * Email:      tuncero@itu.edu.tr
+ * Project:     [EBEK]
+ * File:        [testJ2000Timing.cpp]
+ * Author:      Onur Tuncer, PhD
+ * Email:       tuncero@itu.edu.tr
  * Institution: Istanbul Technical University
+ *              Faculty of Aeronautics and Astronuatics
+ * 
+ * Date:        2024
  *
  * Description:
- * [Brief description of the file's purpose and functionality]
+ * [Routines to aid with calculations with J2000 epoch]
  *
  * License:
- * [Specify the license under which this code is distributed, if applicable]
+ * [See License.txt in the top level directory for licence and copyright information]
  *
  * ----------------------------------------------------------------------------
  */
+

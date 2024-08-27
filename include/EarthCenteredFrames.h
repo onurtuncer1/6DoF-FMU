@@ -1,7 +1,30 @@
+/*
+ * ----------------------------------------------------------------------------
+ * Project:     [EBEK]
+ * File:        [EarthCenteredFrames.h]
+ * Author:      Prof.Dr. Onur Tuncer
+ * Email:       onur.tuncer@itu.edu.tr
+ * Institution: Istanbul Technical University
+ *              Faculty of Aeronuatics and Astronautics
+ * 
+ * Date:        2024
+ *
+ * Description:
+ * [Routines to perform coordinate transformations between ECI and ECEF frames]
+ *
+ * License:
+ * [See License.txt in the top level directory for licence and copyright information]
+ *
+ * ---------------------------------------------------------------------------- 
+ */
 
+ #ifndef EARTH_CENTERED_FRAMES_H
+ #define EARTH_CENTETED_FRAMES_H
 
 #include <cmath>
 #include <iostream>
+
+namespace Coordinate{
 
 constexpr double PI = 3.141592653589793;
 constexpr double DEG_TO_RAD = PI / 180.0;
@@ -37,3 +60,7 @@ std::array<double, 3> ecefToEci(double x, double y, double z, double time_since_
 
     return {x_eci, y_eci, z_eci};
 }
+
+}
+
+#endif 
