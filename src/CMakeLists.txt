@@ -14,8 +14,9 @@ macro(add_fmu)
                 "${local_NAME}/${local_NAME}.cpp"
                 "$<TARGET_OBJECTS:fmu4cpp>")
             
-        target_include_directories(${local_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/export/include
-                                                         ${PROJECT_SOURCE_DIR}/vendor/libode/src)
+        target_include_directories(${local_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/export/include    # includes specific to fmu4cpp
+                                                         ${PROJECT_SOURCE_DIR}/vendor/libode/src # for libode
+                                                         ${PROJECT_SOURCE_DIR}/include)          # for models
 
         target_compile_definitions(${local_NAME} PRIVATE FMU4CPP_MODEL_IDENTIFIER="${local_NAME}")
 

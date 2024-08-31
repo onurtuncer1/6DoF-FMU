@@ -1,9 +1,19 @@
-# /* ----------------------------------------------------------------------------*
-#   Copyright 2024 
+# -----------------------------------------------------------------------------------
+# Project:     [EBEK]
+# File:        [CMakeLists.txt]
+# Author:      Prof.Dr. Onur Tuncer
+# Email:       onur.tuncer@itu.edu.tr
+# Institution: Istanbul Technical University
+#              Faculty of Aeronautics and Astronuatics
+# 
+# Date:        2024
 #
-#   
-#   Contact tuncero@itu.edu.tr
-# -------------------------------------------------------------------------------*/
+# Description:
+# [Top level build file]
+#
+# License:
+# [See License.txt in the top level directory for licence and copyright information]
+# -----------------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.20)
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" projectVersion)
@@ -15,7 +25,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-list(APPEND FMU_TARGETS 3DoFFixedMass)
+list(APPEND FMU_TARGETS GravityJ2)
 
 # ---------------------------------------Looking for git and updating submodules-------------------
 find_package(Git QUIET)
@@ -50,7 +60,8 @@ add_library(libode STATIC ${libode_SRC})
 set_target_properties(libode PROPERTIES     CXX_STANDARD 17
                                             CXX_STANDARD_REQUIRED ON
                                             CXX_EXTENSIONS OFF)
-target_include_directories(libode PUBLIC "vendor/libode/src")
+target_include_directories(libode PUBLIC "vendor/libode/src"
+                                          "vendor/libode/include/ode")
 # ********************************************************************************
 
 if (MSVC)

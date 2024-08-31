@@ -60,6 +60,3 @@ constexpr std::array<T, 3> calculateGravitationalAcceleration(T x, T y, T z) {
 } // namespace J2
 
 #endif // GRAVITATIONAL_MODELS_H
-
-
-#endif // GRAVITATIONAL_MODELS_H
