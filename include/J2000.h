@@ -1,9 +1,9 @@
 /*
- * ----------------------------------------------------------------------------
+ * ----------------------------------------------------------------------------------
  * Project:     [EBEK]
  * File:        [J2000.h]
- * Author:      Onur Tuncer, PhD
- * Email:       tuncero@itu.edu.tr
+ * Author:      Prof.Dr. Onur Tuncer
+ * Email:       onur.tuncer@itu.edu.tr
  * Institution: Istanbul Technical University
  *              Faculty of Aeronautics and Astronuatics
  * 
@@ -15,7 +15,7 @@
  * License:
  * [See License.txt in the top level directory for licence and copyright information]
  *
- * ----------------------------------------------------------------------------
+ * ----------------------------------------------------------------------------------
  */
 
 #ifndef J2000_H
