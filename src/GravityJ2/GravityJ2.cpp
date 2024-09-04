@@ -18,7 +18,6 @@
  * -----------------------------------------------------------------------------------
  */
 
-#include <utility>
 #include <fmu4cpp/fmu_base.hpp>
 #include "GravitationalModels.h"
 
@@ -30,12 +29,6 @@ public:
     Model(const std::string &instanceName, const std::string &resources)
         : fmu_base(instanceName, resources) {
 
-        // register_variable(
-                // real(
-                //         "Gain", [this] { return m_Gain; }, [this](double value) { m_Gain = value; })
-                //         .setCausality(causality_t::PARAMETER)
-                //         .setVariability(variability_t::FIXED));
-    
         register_variable(
                 real(
                         "eci_rx", [this] { return m_EciRx; }, [this](double value) { m_EciRx = value; })
@@ -65,7 +58,7 @@ public:
 
         register_variable(
                 real(
-                        "eci_gx", [this] { return m_EciGx; })
+                        "eci_gy", [this] { return m_EciGy; })
                         .setCausality(causality_t::OUTPUT)
                         .setVariability(variability_t::CONTINUOUS)
                         .setDependencies({get_real_variable("eci_rx")->index(),
@@ -74,7 +67,7 @@ public:
         
         register_variable(
                 real(
-                        "eci_gx", [this] { return m_EciGx; })
+                        "eci_gz", [this] { return m_EciGz; })
                         .setCausality(causality_t::OUTPUT)
                         .setVariability(variability_t::CONTINUOUS)
                         .setDependencies({get_real_variable("eci_rx")->index(),
@@ -87,7 +80,7 @@ public:
     bool do_step(double currentTime, double dt) override {
 
         try{
-            auto result = J2::calculateGravitationalAcceleration<double>(m_EciRx, m_EciRy, m_EciRz);
+            auto result = J2::calculateGravitationalAcceleration(m_EciRx, m_EciRy, m_EciRz);
             m_EciGx = result[0];
             m_EciGy = result[1];
             m_EciGz = result[2];

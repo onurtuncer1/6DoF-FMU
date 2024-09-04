@@ -61,6 +61,28 @@ std::array<double, 3> ecefToEci(double x, double y, double z, double time_since_
     return {x_eci, y_eci, z_eci};
 }
 
+std::array<double, 3> ecefToEciVel(double x, double y, double z, double vx, double vy, double vz, double time_since_epoch) {
+    // Earth's rotation rate in radians per second
+    double earth_rotation_rate = 2 * PI / 86400.0; // 7.2921159e-5 rad/s
+    double theta = earth_rotation_rate * time_since_epoch;
+
+    // Rotation matrix components
+    double cos_theta = std::cos(theta);
+    double sin_theta = std::sin(theta);
+
+    // Position rotation (already done in your original function)
+    double x_eci =  cos_theta * x + sin_theta * y;
+    double y_eci = -sin_theta * x + cos_theta * y;
+    double z_eci = z; // Z-coordinate is unchanged
+
+    // Velocity rotation considering Earth's rotation
+    double vx_eci =  cos_theta * vx + sin_theta * vy + earth_rotation_rate * (-sin_theta * x + cos_theta * y);
+    double vy_eci = -sin_theta * vx + cos_theta * vy + earth_rotation_rate * (-cos_theta * x - sin_theta * y);
+    double vz_eci = vz; // Z-component of velocity is unchanged
+
+    return {vx_eci, vy_eci, vz_eci};
+}
+
 }
 
 #endif 

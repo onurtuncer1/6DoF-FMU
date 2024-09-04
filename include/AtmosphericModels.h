@@ -24,6 +24,7 @@
 #include <array>
 #include <ranges>
 #include <concepts>
+#include <limits> // For std::numeric_limits<double>::quiet_NaN()
 
 namespace US1976{
 
@@ -50,43 +51,46 @@ constexpr std::array<Layer, 6> layers = {{
     {51000, 71000, 270.65, 0.0, 66.94} // Thermosphere
 }};
 
-// Concept to ensure altitude is within a valid range
-template<typename T>
-concept ValidAltitude = std::floating_point<T> && T >= 0;
+// template<typename T>
+// concept ValidAltitude = std::floating_point<T>;
 
-constexpr double temperature(ValidAltitude auto altitude) {
+template<typename T>
+constexpr T Temperature(T altitude) {
     for (const auto& layer : layers) {
         if (altitude >= layer.altitude_min && altitude <= layer.altitude_max) {
             return layer.temperature_base + layer.temperature_gradient * (altitude - layer.altitude_min);
         }
     }
-    return std::nan(""); // Return NaN if altitude is out of range
+     return std::numeric_limits<T>::quiet_NaN(); // Return NaN if altitude is out of range
 }
 
-constexpr double pressure(ValidAltitude auto altitude) {
+template<typename T>
+constexpr T Pressure(T altitude) {
     for (const auto& layer : layers) {
         if (altitude >= layer.altitude_min && altitude <= layer.altitude_max) {
-            double T0 = layer.temperature_base;
-            double P0 = layer.pressure_base;
-            double L = layer.temperature_gradient;
-            double T = temperature(altitude);
+            T T0 = layer.temperature_base;
+            T P0 = layer.pressure_base;
+            T L = layer.temperature_gradient;
+            T Te = Temperature(altitude);
             
             // Calculate pressure using the barometric formula
             if (L != 0) {
-                return P0 * std::pow((T / T0), (g0 / (R * L)));
+                return P0 * std::pow((Te / T0), (g0 / (R * L)));
             } else {
                 return P0 * std::exp(-g0 * (altitude - layer.altitude_min) / (R * T0));
             }
         }
     }
-    return std::nan(""); // Return NaN if altitude is out of range
+    return std::numeric_limits<T>::quiet_NaN(); // Return NaN if altitude is out of range
 }
 
-constexpr double density(ValidAltitude auto altitude) {
-    double T = temperature(altitude);
-    double P = pressure(altitude);
-    return P / (R * T);
+template<typename T>
+constexpr T Density(T altitude) {
+    T Te = Temperature(altitude);
+    T P = Pressure(altitude);
+    return P / (R * Te);
 }
 
-}
+}//namespace US1976
+
 #endif // ATMOSPHERIC_MODELS_H

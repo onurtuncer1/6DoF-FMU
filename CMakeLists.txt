@@ -25,7 +25,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-list(APPEND FMU_TARGETS GravityJ2)
+list(APPEND FMU_TARGETS GravityJ2
+                        AtmosphereUS1976)
 
 # ---------------------------------------Looking for git and updating submodules-------------------
 find_package(Git QUIET)

@@ -18,7 +18,6 @@
  * -----------------------------------------------------------------------------------
  */
 
-#include <utility>
 #include <fmu4cpp/fmu_base.hpp>
 #include "AtmosphericModels.h"
 
@@ -32,49 +31,64 @@ public:
 
         register_variable(
                 real(
-                        "Gain", [this] { return m_Gain; }, [this](double value) { m_Gain = value; })
-                        .setCausality(causality_t::PARAMETER)
-                        .setVariability(variability_t::FIXED));
-    
-        register_variable(
-                real(
-                        "Input", [this] { return m_Input; }, [this](double value) { m_Input = value; })
+                        "Altitude", [this] { return m_Altitude; }, [this](double value) { m_Altitude = value; })
                         .setCausality(causality_t::INPUT)
                         .setVariability(variability_t::CONTINUOUS));
       
         register_variable(
                 real(
-                        "Output", [this] { return m_Output; })
+                        "Pressure", [this] { return m_Pressure; })
                         .setCausality(causality_t::OUTPUT)
                         .setVariability(variability_t::CONTINUOUS)
-                        .setDependencies({get_real_variable("Input")->index(),
-                                          get_real_variable("Gain")->index()}));
+                        .setDependencies({get_real_variable("Altitude")->index()}));
+
+        register_variable(
+                real(
+                        "Temperature", [this] { return m_Temperature; })
+                        .setCausality(causality_t::OUTPUT)
+                        .setVariability(variability_t::CONTINUOUS)
+                        .setDependencies({get_real_variable("Altitude")->index()}));
+
+        register_variable(
+                real(
+                        "Density", [this] { return m_Density; })
+                        .setCausality(causality_t::OUTPUT)
+                        .setVariability(variability_t::CONTINUOUS)
+                        .setDependencies({get_real_variable("Altitude")->index()}));
      
         Model::reset();
     }
 
     bool do_step(double currentTime, double dt) override {
-        m_Output = m_Input * m_Gain;
-        return true;
+
+        try{
+            m_Temperature = US1976::Temperature(m_Altitude);
+            m_Pressure    = US1976::Pressure(m_Altitude);
+            m_Density     = US1976::Density(m_Altitude);
+            return true;
+        }catch(...){
+            return false;
+        } 
     }
 
     void reset() override {
        m_Altitude = 0.0;
-       m_Temperature = 1.0;
+       m_Temperature = 0.0;
        m_Pressure = 0.0;
        m_Density = 0.0;
     }
 
 private:
-    double m_Input;
-    double m_Output;
-    double m_Gain;
+    double m_Altitude;
+    double m_Temperature;
+    double m_Pressure;
+    double m_Density;
 };
 
 model_info fmu4cpp::get_model_info() {
     model_info info;
     info.modelName = "AtmosphereUS1976";
-    info.description = "A simple linear gain model";
+    info.description = "US1976 atmospheric model";
     info.modelIdentifier = FMU4CPP_MODEL_IDENTIFIER;
     return info;
 }

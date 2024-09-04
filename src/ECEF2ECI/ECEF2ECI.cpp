@@ -18,7 +18,6 @@
  * -----------------------------------------------------------------------------------
  */
 
-#include <utility>
 #include <fmu4cpp/fmu_base.hpp>
 #include "EarthCenteredFrames.h"
 
@@ -32,15 +31,48 @@ public:
 
         register_variable(
                 real(
-                        "Gain", [this] { return m_Gain; }, [this](double value) { m_Gain = value; })
-                        .setCausality(causality_t::PARAMETER)
-                        .setVariability(variability_t::FIXED));
+                        "ec", [this] { return m_Tim; }, [this](double value) { m_ = value; })
+                        .setCausality(causality_t::INPUT)
+                        .setVariability(variability_t::CONTINUOUS));
     
         register_variable(
                 real(
-                        "Input", [this] { return m_Input; }, [this](double value) { m_Input = value; })
+                        "ecef_rx", [this] { return m_EcefRx; }, [this](double value) { m_EcefRx = value; })
                         .setCausality(causality_t::INPUT)
                         .setVariability(variability_t::CONTINUOUS));
+
+        register_variable(
+                real(
+                        "ecef_rx", [this] { return m_EcefRx; }, [this](double value) { m_EcefRx = value; })
+                        .setCausality(causality_t::INPUT)
+                        .setVariability(variability_t::CONTINUOUS));
+
+        register_variable(
+                real(
+                        "ecef_rx", [this] { return m_EcefRx; }, [this](double value) { m_EcefRx = value; })
+                        .setCausality(causality_t::INPUT)
+                        .setVariability(variability_t::CONTINUOUS));
+
+        
+        register_variable(
+                real(
+                        "ecef_rx", [this] { return m_EcefRx; }, [this](double value) { m_EcefRx = value; })
+                        .setCausality(causality_t::INPUT)
+                        .setVariability(variability_t::CONTINUOUS));
+
+        register_variable(
+                real(
+                        "ecef_rx", [this] { return m_EcefRx; }, [this](double value) { m_EcefRx = value; })
+                        .setCausality(causality_t::INPUT)
+                        .setVariability(variability_t::CONTINUOUS));
+
+        register_variable(
+                real(
+                        "ecef_rx", [this] { return m_EcefRx; }, [this](double value) { m_EcefRx = value; })
+                        .setCausality(causality_t::INPUT)
+                        .setVariability(variability_t::CONTINUOUS));
+
+        
       
         register_variable(
                 real(
@@ -54,27 +86,39 @@ public:
     }
 
     bool do_step(double currentTime, double dt) override {
-        m_Output = m_Input * m_Gain;
-        return true;
+        
+         try{
+            
+            return true;
+        }catch(...){
+            return false;
+        } 
     }
 
     void reset() override {
-       m_Altitude = 0.0;
-       m_Temperature = 1.0;
-       m_Pressure = 0.0;
-       m_Density = 0.0;
+      m_EcefRx = 0;
     }
 
 private:
-    double m_Input;
-    double m_Output;
-    double m_Gain;
+    double m_EcefRx;
+    double m_EcefRy;
+    double m_EcefRz;
+    double m_EcefVx;
+    double m_EcefVy;
+    double m_EcefVz;
+    double m_TimeSinceEpoch;
+    double m_EciRx;
+    double m_EciRy;
+    double m_EciRz;
+    double m_EciVx;
+    double m_EciVy;
+    double m_EciVz;
 };
 
 model_info fmu4cpp::get_model_info() {
     model_info info;
-    info.modelName = "AtmosphereUS1976";
-    info.description = "A simple linear gain model";
+    info.modelName = "ECEF2ECI";
+    info.description = "Convert position and velocity from ECEF to ECI frame";
     info.modelIdentifier = FMU4CPP_MODEL_IDENTIFIER;
     return info;
 }
